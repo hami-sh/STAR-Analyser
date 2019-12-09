@@ -1,0 +1,156 @@
+import os
+import matplotlib.pyplot as plt
+from collections import OrderedDict
+import numpy as np
+import pandas as pd
+
+pcawg_pe_sig = OrderedDict()
+pcawg_pe_noise = OrderedDict()
+pcawg_pe_overhang = OrderedDict()
+pcawg_se_sig = OrderedDict()
+pcawg_se_noise = OrderedDict()
+pcawg_se_overhang = OrderedDict()
+
+tcga_pe_sig = OrderedDict()
+tcga_pe_noise = OrderedDict()
+tcga_pe_overhang = OrderedDict()
+tcga_se_sig = OrderedDict()
+tcga_se_noise = OrderedDict()
+tcga_se_overhang = OrderedDict()
+
+def main():
+    file_handler()
+    grapher()
+
+def grapher():
+    # ----------PCAWG PE
+    # sig
+    graph(pcawg_pe_sig, "pcawg_pe_sig")
+    # noise
+    graph(pcawg_pe_noise, "pcawg_pe_noise")
+    # overhang
+    graph(pcawg_pe_overhang, "pcawg_pe_overhang")
+    # ----------PCAWG SE
+    # sig
+    graph(pcawg_se_sig, "pcawg_se_sig")
+    # noise
+    graph(pcawg_se_noise, "pcawg_se_noise")
+    # overhang
+    graph(pcawg_se_overhang, "pcawg_se_overhang")
+
+    # TCGA PE
+    # sig
+    graph(tcga_se_sig, "tcga_se_sig")
+    # noise
+    graph(tcga_se_noise, "tcga_se_noise")
+    # overhang
+    graph(tcga_se_overhang, "tcga_se_overhang")
+
+    # TCGA SE
+    # sig
+    graph(tcga_pe_sig, "tcga_pe_sig")
+    # noise
+    graph(tcga_pe_noise, "tcga_pe_noise")
+    # overhang
+    graph(tcga_pe_overhang, "tcga_pe_overhang")
+
+
+def graph(dictionary, name):
+    x_dups = [x[0] for x in dictionary.keys()]
+    x = list(dict.fromkeys(x_dups))
+    print(len(x))
+    print(x)
+
+    one = list()
+    two = list()
+    other = list()
+    keys = dictionary.keys()
+    for item in keys:
+        if item[1] == '1':
+            one.append(int(dictionary[item]))
+        elif item[1] == '2':
+            two.append(int(dictionary[item]))
+        elif item[1] == 'mid':
+            other.append(int(dictionary[item]))
+    # while len(one) != len(x):
+    #     one.append(0)
+    # while len(two) != len(x):
+    #     two.append(0)
+    # while len(other) != len(x):
+    #     other.append(0)
+    print(one)
+    print(two)
+    print(other)
+    df = pd.DataFrame(np.c_[one, two, other], index=x)
+    ax = df.plot(kind='bar')
+    ax.legend(["1st Intron", "2nd Intron", "Other"])
+    plt.savefig('plots/' + name + '.png', dpi=300)
+    plt.show()
+
+def file_handler():
+    # handle those with transcript
+    for filename in os.listdir('files'):
+        # print("-----------------------")
+        # print(filename)
+        if filename != '0':
+            fp = open('files/' + filename)
+            for cnt, line in enumerate(fp):
+                # print("Line {}: {}".format(cnt, line))
+                # split line on space
+                details = line.split()
+                # print(details)
+                details[0] = details[0].strip(".SJ.out.tab:chr8").split("/")[0]
+                if 'pcawg' in filename:
+                    # add to pcawg dict
+                    if 'pe' in filename:
+                        pcawg_pe_sig[details[0], filename.split("_")[-1].split(".")[0]] = details[1]
+                        pcawg_pe_noise[details[0], filename.split("_")[-1].split(".")[0]] = details[2]
+                        pcawg_pe_overhang[details[0], filename.split("_")[-1].split(".")[0]] = details[3]
+
+                    if 'se' in filename:
+                        pcawg_se_sig[details[0], filename.split("_")[-1].split(".")[0]] = details[1]
+                        pcawg_se_noise[details[0], filename.split("_")[-1].split(".")[0]] = details[2]
+                        pcawg_se_overhang[details[0], filename.split("_")[-1].split(".")[0]] = details[3]
+                if 'tcga' in filename:
+                    # add to tcga dict
+                    if 'pe' in filename:
+                        tcga_pe_sig[details[0], filename.split("_")[-1].split(".")[0]] = details[1]
+                        tcga_pe_noise[details[0], filename.split("_")[-1].split(".")[0]] = details[2]
+                        tcga_pe_overhang[details[0], filename.split("_")[-1].split(".")[0]] = details[3]
+                    if 'se' in filename:
+                        tcga_se_sig[details[0], filename.split("_")[-1].split(".")[0]] = details[1]
+                        tcga_se_noise[details[0], filename.split("_")[-1].split(".")[0]] = details[2]
+                        tcga_se_overhang[details[0], filename.split("_")[-1].split(".")[0]] = details[3]
+
+    for filename in os.listdir('files/0'):
+        fp = open('files/0/' + filename)
+        for cnt, line in enumerate(fp):
+            # split line on space
+            details = line.split()
+            details[0] = details[0].strip(".SJ.out.tab:chr8").split("/")[0]
+
+            if 'pcawg' in filename:
+                # add to pcawg dict
+                if 'pe' in filename:
+                    pcawg_pe_sig[details[0], filename.split("_")[-1].split(".")[0]] = 0
+                    pcawg_pe_noise[details[0], filename.split("_")[-1].split(".")[0]] = 0
+                    pcawg_pe_overhang[details[0], filename.split("_")[-1].split(".")[0]] = 0
+
+                if 'se' in filename:
+                    pcawg_se_sig[details[0], filename.split("_")[-1].split(".")[0]] = 0
+                    pcawg_se_noise[details[0], filename.split("_")[-1].split(".")[0]] = 0
+                    pcawg_se_overhang[details[0], filename.split("_")[-1].split(".")[0]] = 0
+            if 'tcga' in filename:
+                # add to tcga dict
+                if 'pe' in filename:
+                    tcga_pe_sig[details[0], filename.split("_")[-1].split(".")[0]] = 0
+                    tcga_pe_noise[details[0], filename.split("_")[-1].split(".")[0]] = 0
+                    tcga_pe_overhang[details[0], filename.split("_")[-1].split(".")[0]] = 0
+                if 'se' in filename:
+                    tcga_se_sig[details[0], filename.split("_")[-1].split(".")[0]] = 0
+                    tcga_se_noise[details[0], filename.split("_")[-1].split(".")[0]] = 0
+                    tcga_se_overhang[details[0], filename.split("_")[-1].split(".")[0]] = 0
+
+
+if __name__ == "__main__":
+    main()
