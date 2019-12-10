@@ -1,2 +1,0 @@
-52efbeb4-7b23-4c49-92f9-931a3eb99055/52efbeb4-7b23-4c49-92f9-931a3eb99055.SJ.out.tab:chr8 2 0 20
-69ef3e70-5d7a-4e30-abde-0f9f76ea3141/69ef3e70-5d7a-4e30-abde-0f9f76ea3141.SJ.out.tab:chr8 1 0 18
